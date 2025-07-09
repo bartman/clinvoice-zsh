@@ -193,6 +193,7 @@ vars[sequence]=${gen_seq:-1}
 vars[today]=$(date +%s)
 vars[totalhours]=
 vars[hourlyrate]=${conf[contract.hourly-rate]}
+vars[maxmonthlyhours]=${conf[contract.max-monthly-hours]}
 
 local tax=${conf[contract.tax]}
 [[ $tax =~ "^([^ ]+)\s+([0-9.]+)%\s*$" ]] || die "invalid contract.tax format '$tax' (ex: VAT 5%)"
@@ -231,8 +232,21 @@ if [[ ${#discount_ttl_amt} -gt 0 ]] ; then
 fi
 vars[totaldiscount]=$totaldiscount
 
+if [[ -n "${vars[maxmonthlyhours]}" ]] ; then
+    local -F hoursovercount=0
+    local -F hoursoverdiscount=0
+
+    if [[ ${vars[totalhours]} -gt ${vars[maxmonthlyhours]} ]] ; then
+        hoursovercount=$(( ${vars[totalhours]} - ${vars[maxmonthlyhours]} ))
+        hoursoverdiscount=$(( hoursovercount * rate ))
+    fi
+
+    vars[hoursovercount]=$hoursovercount
+    vars[hoursoverdiscount]=$hoursoverdiscount
+fi
+
 local -F totalcost
-let "totalcost = $subtotalcost + $taxcost - $totaldiscount"
+let "totalcost = $subtotalcost + $taxcost - $totaldiscount - $hoursoverdiscount"
 vars[totalcost]=$totalcost
 
 # setup escaping
