@@ -3,6 +3,10 @@
 This is CLInvoice.  This software is meant to generate invoices from a simple
 text file, a latex template, and a config file.
 
+**DEPRICATED**: I've since rewritten this tool in Rust, and
+I will not be adding any new veatures this project.
+See https://github.com/bartman/clinvoice-rs
+
 # Goals
 
  - use simple input files (text based)
